@@ -10,8 +10,8 @@ import (
 var _ = Describe("Pattern", func() {
 	Context("NewPattern", func() {
 		It("should create a new pattern successfully", func() {
-			p := NewPattern(50, func() interface{} {
-				return struct{}{}
+			p := NewPattern(50, func() (interface{}, error) {
+				return struct{}{}, nil
 			})
 			Ω(p).ShouldNot(BeNil())
 			Ω(p.Fn()).ShouldNot(BeNil())

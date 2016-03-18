@@ -1,6 +1,7 @@
 package traffic
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -31,12 +32,29 @@ func (g *Generator) AddPattern(p *Pattern) {
 // recalculate runs a bunch of calculations to set the correct probabilities
 // in the generator.
 func (g *Generator) recalculate() {
-	// TODO: Implement recalculation
+	newSum := 0
+	for _, p := range g.patterns {
+		newSum += p.Probability
+	}
+	g.sum = newSum
 }
 
 // Next calls a random function according to the traffic patterns contained
 // in this generator.
-func (g *Generator) Next() interface{} {
-	// TODO: Implement this
-	return struct{}{}
+func (g *Generator) Next() (interface{}, error) {
+	// Check if any patterns have been added to the Generator
+	if len(g.patterns) == 0 {
+		return nil, errors.New("No Patterns have been added to the generator.")
+	}
+
+	// Generate a random number
+	prob := g.randGenerator.Intn(g.sum) + 1
+	c := 0
+	for _, p := range g.patterns {
+		c += p.Probability
+		if c >= prob {
+			return p.Fn()
+		}
+	}
+	return nil, errors.New("This should never be reached")
 }
