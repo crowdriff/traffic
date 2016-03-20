@@ -13,18 +13,24 @@ Say I have an HTTP Server that I want to test and my simulated traffic pattern s
 gen := traffic.NewGenerator(1000)
 // Add a traffic pattern that'll hit the /hello endpoint with
 // 25% probability
-gen.AddPattern(&traffic.Pattern{25, func() (interface{}, error) {
-	URL := fmt.Sprintf("http://%s/hello/world", serverURL)
-	return http.Get(URL)
-}})
+gen.AddPattern(&traffic.Pattern{
+	Probability: 25,
+	Fn: func() {
+		URL := fmt.Sprintf("http://%s/hello/world", serverURL)
+		http.Get(URL)
+	},
+})
 // Add a second traffic pattern that'll hit the /bye endpoint with
 // 75% probability
-gen.AddPattern(&traffic.Pattern{75, func() (interface{}, error) {
-	URL := fmt.Sprintf("http://%s/bye/world", serverURL)
-	return http.Get(URL)
-}})
+gen.AddPattern(&traffic.Pattern{
+	Probability: 75,
+	Fn: func() {
+		URL := fmt.Sprintf("http://%s/bye/world", serverURL)
+		http.Get(URL)
+	},
+})
 // Execute the traffic generator
 gen.Execute()
 ```
   
-This will execute 1000 requests one-by-one and make an attempt to do a 25/75 split between `/hello` and `/bye`.
+This will execute 1000 requests sequentially and make an attempt to do a 25/75 split between `/hello` and `/bye`.

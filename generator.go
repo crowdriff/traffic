@@ -1,7 +1,6 @@
 package traffic
 
 import (
-	"errors"
 	"math/rand"
 	"sync"
 	"time"
@@ -50,41 +49,33 @@ func (g *Generator) recalculate() {
 	g.sum = newSum
 }
 
-// Next calls a random function according to the traffic patterns contained
-// in this generator.
-func (g *Generator) Next() (interface{}, error) {
+// Execute fast forwards through all the iterations.
+func (g *Generator) Execute() {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 
 	// Check if any patterns have been added to the Generator
 	if len(g.patterns) == 0 {
-		return nil, errors.New("No Patterns have been added to the generator.")
+		//errors.New("No Patterns have been added to the generator.")
+		return
 	}
 
-	// Check if we've already delivered all the items
-	if g.itemsDelivered >= g.maxItems {
-		return nil, errors.New("Max number of iterations reached")
-	}
-
-	// Generate a random number
-	g.itemsDelivered++
-	prob := g.randGenerator.Intn(g.sum) + 1
-	c := 0
-	for _, p := range g.patterns {
-		c += p.Probability
-		if c >= prob {
-			return p.Fn()
-		}
-	}
-	return nil, errors.New("This should never be reached")
-}
-
-// Execute fast forwards through all the iterations.
-func (g *Generator) Execute() {
 	for {
-		_, err := g.Next()
-		if err != nil {
+		// Check if we've already delivered all the items
+		if g.itemsDelivered >= g.maxItems {
 			return
+		}
+
+		// Generate a random number
+		g.itemsDelivered++
+		prob := g.randGenerator.Intn(g.sum) + 1
+		c := 0
+		for _, p := range g.patterns {
+			c += p.Probability
+			if c >= prob {
+				p.Fn()
+				break
+			}
 		}
 	}
 }

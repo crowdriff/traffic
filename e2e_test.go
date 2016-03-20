@@ -1,6 +1,8 @@
 package traffic_test
 
 import (
+	"sync/atomic"
+
 	. "github.com/crowdriff/traffic"
 
 	. "github.com/onsi/ginkgo"
@@ -11,92 +13,76 @@ var _ = Describe("Generator", func() {
 	It("should be able to add 2 patterns with 50/50% prob", func() {
 		g := NewGenerator(1000)
 		Ω(g).ShouldNot(BeNil())
-		g.AddPattern(NewPattern(50, func() (interface{}, error) {
-			return []int{1}, nil
+
+		var first, second uint32
+		g.AddPattern(NewPattern(50, func() {
+			atomic.AddUint32(&first, 1)
 		}))
-		g.AddPattern(NewPattern(50, func() (interface{}, error) {
-			return []int{2}, nil
+		g.AddPattern(NewPattern(50, func() {
+			atomic.AddUint32(&second, 1)
 		}))
+		g.Execute()
 
-		first := 0
-		second := 0
-		for i := 0; i < 1000; i++ {
-			res, err := g.Next()
-			Ω(err).Should(BeNil())
-			Ω(res).ShouldNot(BeNil())
-
-			r := res.([]int)
-			Ω(len(r)).Should(Equal(1))
-			if r[0] == 1 {
-				first++
-			} else {
-				second++
-			}
-		}
-
-		Ω(first).Should(BeNumerically(">=", 450))
-		Ω(first).Should(BeNumerically("<=", 550))
-		Ω(second).Should(BeNumerically(">=", 450))
-		Ω(second).Should(BeNumerically("<=", 550))
+		var lower uint32 = 450
+		var upper uint32 = 550
+		Ω(first).Should(BeNumerically(">=", lower))
+		Ω(first).Should(BeNumerically("<=", upper))
+		Ω(second).Should(BeNumerically(">=", lower))
+		Ω(second).Should(BeNumerically("<=", upper))
 	})
 
 	It("should be able to add 4 patterns with 25% prob each", func() {
+		// Prep
 		g := NewGenerator(10000)
 		Ω(g).ShouldNot(BeNil())
-		g.AddPattern(NewPattern(25, func() (interface{}, error) {
-			return []int{1}, nil
+
+		var first, second, third, fourth uint32
+		g.AddPattern(NewPattern(25, func() {
+			atomic.AddUint32(&first, 1)
 		}))
-		g.AddPattern(NewPattern(25, func() (interface{}, error) {
-			return []int{2}, nil
+		g.AddPattern(NewPattern(25, func() {
+			atomic.AddUint32(&second, 1)
 		}))
-		g.AddPattern(NewPattern(25, func() (interface{}, error) {
-			return []int{3}, nil
+		g.AddPattern(NewPattern(25, func() {
+			atomic.AddUint32(&third, 1)
 		}))
-		g.AddPattern(NewPattern(25, func() (interface{}, error) {
-			return []int{4}, nil
+		g.AddPattern(NewPattern(25, func() {
+			atomic.AddUint32(&fourth, 1)
 		}))
 
-		responses := map[int]int{1: 0, 2: 0, 3: 0, 4: 0}
-		for i := 0; i < 10000; i++ {
-			res, err := g.Next()
-			Ω(err).Should(BeNil())
-			Ω(res).ShouldNot(BeNil())
+		// Run the generator
+		g.Execute()
 
-			r := res.([]int)
-			Ω(len(r)).Should(Equal(1))
-			responses[r[0]] = responses[r[0]] + 1
-		}
-
-		for i := 1; i < 5; i++ {
-			Ω(responses[i]).Should(BeNumerically(">=", 2000))
-			Ω(responses[i]).Should(BeNumerically("<=", 3000))
-		}
+		// Assert
+		var lower uint32 = 2000
+		var upper uint32 = 3000
+		Ω(first).Should(BeNumerically(">=", lower))
+		Ω(first).Should(BeNumerically("<=", upper))
+		Ω(second).Should(BeNumerically(">=", lower))
+		Ω(second).Should(BeNumerically("<=", upper))
+		Ω(third).Should(BeNumerically(">=", lower))
+		Ω(third).Should(BeNumerically("<=", upper))
+		Ω(fourth).Should(BeNumerically(">=", lower))
+		Ω(fourth).Should(BeNumerically("<=", upper))
 	})
 
 	It("should be able to add 2 patterns with 25/75% prob", func() {
-		g := NewGenerator(10000)
+		g := NewGenerator(1000)
 		Ω(g).ShouldNot(BeNil())
-		g.AddPattern(NewPattern(25, func() (interface{}, error) {
-			return []int{1}, nil
+
+		var first, second uint32
+		g.AddPattern(NewPattern(25, func() {
+			atomic.AddUint32(&first, 1)
 		}))
-		g.AddPattern(NewPattern(75, func() (interface{}, error) {
-			return []int{2}, nil
+		g.AddPattern(NewPattern(75, func() {
+			atomic.AddUint32(&second, 1)
 		}))
 
-		responses := map[int]int{1: 0, 2: 0}
-		for i := 0; i < 1000; i++ {
-			res, err := g.Next()
-			Ω(err).Should(BeNil())
-			Ω(res).ShouldNot(BeNil())
+		g.Execute()
 
-			r := res.([]int)
-			Ω(len(r)).Should(Equal(1))
-			responses[r[0]] = responses[r[0]] + 1
-		}
-
-		Ω(responses[1]).Should(BeNumerically(">=", 200))
-		Ω(responses[1]).Should(BeNumerically("<=", 300))
-		Ω(responses[2]).Should(BeNumerically(">=", 700))
-		Ω(responses[2]).Should(BeNumerically("<=", 800))
+		Ω(first).Should(BeNumerically(">=", uint32(200)))
+		Ω(first).Should(BeNumerically("<=", uint32(300)))
+		Ω(second).Should(BeNumerically(">=", uint32(700)))
+		Ω(second).Should(BeNumerically("<=", uint32(800)))
 	})
 })

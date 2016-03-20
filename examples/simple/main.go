@@ -39,18 +39,18 @@ func main() {
 	// 25% probability
 	gen.AddPattern(&traffic.Pattern{
 		Probability: 25,
-		Fn: func() (interface{}, error) {
+		Fn: func() {
 			URL := fmt.Sprintf("http://%s/hello/world", serverURL)
-			return http.Get(URL)
+			http.Get(URL)
 		},
 	})
 	// Add a second traffic pattern that'll hit the /bye endpoint with
 	// 75% probability
 	gen.AddPattern(&traffic.Pattern{
 		Probability: 75,
-		Fn: func() (interface{}, error) {
+		Fn: func() {
 			URL := fmt.Sprintf("http://%s/bye/world", serverURL)
-			return http.Get(URL)
+			http.Get(URL)
 		},
 	})
 	// Execute the traffic generator
