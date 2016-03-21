@@ -10,7 +10,7 @@ Say I have an HTTP Server that I want to test and my simulated traffic pattern s
   
 ```go
 // Create a new traffic generator that will execute 1000 requests
-gen := traffic.NewGenerator(1000)
+gen := traffic.NewGenerator(1000, 1)
 // Add a traffic pattern that'll hit the /hello endpoint with
 // 25% probability
 gen.AddPattern(&traffic.Pattern{
