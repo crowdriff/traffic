@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Generator", func() {
 	It("should be able to add 2 patterns with 50/50% prob", func() {
-		g := NewGenerator(1000)
+		g := NewGenerator(1000, 1)
 		Ω(g).ShouldNot(BeNil())
 
 		var first, second uint32
@@ -33,7 +33,7 @@ var _ = Describe("Generator", func() {
 
 	It("should be able to add 4 patterns with 25% prob each", func() {
 		// Prep
-		g := NewGenerator(10000)
+		g := NewGenerator(10000, 1)
 		Ω(g).ShouldNot(BeNil())
 
 		var first, second, third, fourth uint32
@@ -67,7 +67,7 @@ var _ = Describe("Generator", func() {
 	})
 
 	It("should be able to add 2 patterns with 25/75% prob", func() {
-		g := NewGenerator(1000)
+		g := NewGenerator(1000, 1)
 		Ω(g).ShouldNot(BeNil())
 
 		var first, second uint32
