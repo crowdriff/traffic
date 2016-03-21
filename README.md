@@ -1,4 +1,4 @@
-# Traffic [![Build Status](https://travis-ci.org/crowdriff/traffic.svg?branch=master)](https://travis-ci.org/crowdriff/traffic) [![Go Report Card](https://goreportcard.com/badge/github.com/crowdriff/traffic)](https://goreportcard.com/report/github.com/crowdriff/traffic) [![Coverage Status](https://coveralls.io/repos/github/crowdriff/traffic/badge.svg?branch=master)](https://coveralls.io/github/crowdriff/traffic?branch=master)
+# Traffic [![Build Status](https://travis-ci.org/crowdriff/traffic.svg?branch=master)](https://travis-ci.org/crowdriff/traffic) [![Go Report Card](https://goreportcard.com/badge/github.com/crowdriff/traffic)](https://goreportcard.com/report/github.com/crowdriff/traffic) [![Coverage Status](https://coveralls.io/repos/github/crowdriff/traffic/badge.svg?branch=master)](https://coveralls.io/github/crowdriff/traffic?branch=master) [![GoDoc](https://godoc.org/github.com/crowdriff/traffic?status.svg)](https://godoc.org/github.com/crowdriff/traffic)
 ===
 
 A traffic pattern generator for all your Go testing/benchmarking needs.  
